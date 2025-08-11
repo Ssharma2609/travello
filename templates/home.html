@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Blog - Featured Destinations</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'main_styles.css' %}">
+    
+</head>
+<body>
+    <header>
+
+        <div class="welcome-section">
+            <h1>WELCOME TO TRAVEL BLOG</h1>
+            <p>Discover the world with us</p>
+        </div>
+    
+
+    <nav class="navbar">
+      <div class="nav-logo"></div>
+      <ul class="nav-links">
+         <li><a href="/">Home</a></li>
+         <li><a href="/about/">About</a></li>
+
+        {% if user.is_authenticated %}
+            <li>Hello, {{  user.first_name  }}</li>
+            <li><a href="{% url 'logout'%}">Logout</a></li>
+        {% else %}
+            <li><a href= "{% url 'register'%}">Register</a></li>
+            <li><a href= "{% url 'login'%}">Login</a></li>
+        {% endif %}
+
+        <div class="header_phone ml-auto">Call us: 00-56 445 678 33</div>
+        
+      </ul>
+    </nav>
+
+    <div class="banner-container">
+            <img src="{% static 'images/banner.jpg' %}" alt="Banner Image" class="banner-image">
+    </div>
+    
+
+    <hr>
+
+</header>
+
+<main>  
+        <h2 class="section-title">🌍 Featured Destinations 🌍</h2>
+
+        {% if featured %}  
+        <div class="destination-grid">
+            {% for d in featured %}
+                <div class="destination-card">
+                    <h3>{{ d.title }}</h3>
+                    <img src="{{ d.image.url }}" alt="{{ d.title }}"  style= "width: 100%; height: auto;">
+                    <p>{{ d.description|truncatechars:100 }}</p>
+
+                    <a href="{% url 'destination_detail' d.id %}">View Details</a>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p style="text-align:center;">No featured destinations available at the moment. 😢</p>
+        {% endif %}    
+</main>
+    <footer>
+        <p>&copy; 2025 Travel Blog. All rights reserved.</p>
+    </footer>
+</body>
+</html>

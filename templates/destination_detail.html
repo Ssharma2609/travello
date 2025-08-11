@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ dest.title }} - Travel Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'main_style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>{{ dest.title }}</h1>
+        <p><a href= "{% url 'home' %}">← Back to Home</a></p>
+        <hr>
+    </header>
+
+    <main>
+        
+            {% if dest.image %}
+                <img src="{{ dest.image.url }}" alt="{{ dest.title }}" width="500">
+            {% else %}
+                <p><em>No image available for this destination.</em></p>    
+            {% endif %}
+
+            <hr>
+
+        <section>
+            <h2><strong> Description :</strong></h2>
+            <div>
+                {{ dest.description|linebreaks }}
+            </div>
+
+        </section>
+
+        <section>
+
+            <h2>📸 More Images</h2>
+            {% if dest.extra_images.all %}
+                <div class="gallery">
+                    {% for img in dest.extra_images.all %}
+                        <img src="{{ img.image.url }}" alt="Additional image of {{ dest.title }}" width="300" style="margin:10px; border-radius: 10px;">
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p><em>No extra images available.</em></p>
+            {% endif %}
+
+        </section>
+
+    
+        <section>
+            <h2>💬 Comments</h2>
+
+            {% if dest.comments.all %}
+                {% for c in dest.comments.all %}
+                    <div class="comment-box">
+                        <p><strong>{{ c.name }}:</strong> ({{ c.created_at|date:"M d, Y" }})</p>
+                        <p>{{ c.comment }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p><em>No comments yet. Be the first to comment!</em></p>
+            {% endif %}
+        <hr>
+
+        {% if user.is_authenticated %}
+            <h3>Leave a Comment</h3>
+            <form method="POST">
+                
+                {% csrf_token %}
+                <label for="name">Name:</label><br>
+                <input type="text" id="name" name="name" required><br><br>
+
+                <label for="comment">Comment:</label><br>
+                <textarea name="comment" id="comment" rows="4" required></textarea><br><br>
+                <button type="submit">Post Comment</button>
+            </form>
+        {% else %}
+            <p><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> to post a comment.</p>
+        {% endif %}
+        </section>  
+    
+    <footer>
+        <p>&copy; 2025 Travel Blog. All rights reserved.</p>
+    </footer>    
+</body>
+</html>
