@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
-from .models import Destination, DestinationImage, Comment
+from .forms import ReviewForm
+from .models import Destination, DestinationImage
 
 def home(request):
     featured = Destination.objects.filter(is_featured=True)
@@ -10,22 +11,46 @@ def home(request):
 def destination_detail(request, id):
     dest = get_object_or_404(Destination, pk=id)
     images = DestinationImage.objects.filter(destination=dest)
+    reviews = dest.reviews.all().order_by('-created_at') 
     
-    if request.method == 'POST':
-        if not request.user.is_authenticated:
-            messages.info(request, 'You must be logged in to comment.')
-            return redirect('login')
-        
-        name = request.POST.get('name')
-        comment = request.POST.get('comment')
-        
-        if name and comment:
-            Comment.objects.create(destination=dest, name=name, comment=comment)
-            messages.success(request, 'Your comment has been posted.')
-            return redirect('destination_detail', id=dest.id)
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            form = ReviewForm(request.POST, request.FILES)
+            if form.is_valid():
+                review = form.save(commit=False)
+                review.destination = dest
+                review.user = request.user
+                review.save()
+                return redirect('destination_detail', id=dest.id)
+            
+            else:
+                return redirect("login")
+            
+    else:
+        form = ReviewForm()
 
-    return render(request, 'destination_detail.html', 
-         {'dest': dest, 'images': images})
+    return render(request, 'destination_detail.html', {
+        'dest': dest,
+        'images': images,
+        'reviews': reviews,
+        'form': form
+    })
+
+    # if request.method == 'POST':
+    #     if not request.user.is_authenticated:
+    #         messages.info(request, 'You must be logged in to comment.')
+    #         return redirect('login')
+        
+    #     name = request.POST.get('name')
+    #     comment = request.POST.get('comment')
+        
+    #     if name and comment:
+    #         Comment.objects.create(destination=dest, name=name, comment=comment)
+    #         messages.success(request, 'Your comment has been posted.')
+    #         return redirect('destination_detail', id=dest.id)
+
+    # return render(request, 'destination_detail.html', 
+    #      {'dest': dest, 'images': images})
 
 def login(request):
     if request.method== 'POST':

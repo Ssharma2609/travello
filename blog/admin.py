@@ -2,7 +2,7 @@
 
 # Register your models here.
 from django.contrib import admin
-from .models import Destination, Comment, DestinationImage
+from .models import Destination, DestinationImage
 
 class DestinationImageInline(admin.TabularInline):
     model = DestinationImage
@@ -13,5 +13,5 @@ class DestinationAdmin(admin.ModelAdmin):
     inlines = [DestinationImageInline]
 
 admin.site.register(Destination, DestinationAdmin)
-admin.site.register(Comment)
+
 admin.site.register(DestinationImage)

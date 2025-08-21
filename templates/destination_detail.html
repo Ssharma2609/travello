@@ -47,8 +47,39 @@
 
         </section>
 
-    
-        <section>
+<section class="reviews-section">
+    <h3>Customer Reviews</h3>
+
+    {% if user.is_authenticated %}
+        <form method="post" enctype="multipart/form-data" class="review-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit Review</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to leave a review.</p>
+    {% endif %}
+
+    <hr>
+
+    {% for review in reviews %}
+        <div class="review-card">
+            <div class="review-header">
+                <strong>{{ review.user.get_full_name }}</strong> - ⭐ {{ review.rating }}/5
+            </div>
+            <p>{{ review.review_text }}</p>
+            {% if review.image %}
+                <img src="{{ review.image.url }}" class="review-image"><br>
+            {% endif %}
+            <small>Posted on {{ review.created_at|date:"F d, Y H:i" }}</small>
+        </div>
+    {% empty %}
+        <p>No reviews yet. Be the first to review!</p>
+    {% endfor %}
+</section>
+
+
+        {% comment %} <section>
             <h2>💬 Comments</h2>
 
             {% if dest.comments.all %}
@@ -78,7 +109,7 @@
         {% else %}
             <p><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> to post a comment.</p>
         {% endif %}
-        </section>  
+        </section>   {% endcomment %}
     
     <footer>
         <p>&copy; 2025 Travel Blog. All rights reserved.</p>
