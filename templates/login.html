@@ -1,38 +1,40 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv='X-UA Compatible' content= 'IE=edge'>
-    <title>Document</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type= 'text/css' media= 'screen' href='main_styles.css' >
-    
+    <title>Login to Travel Blog</title>
+    <link rel="stylesheet" href="{% static 'main_styles.css' %}">
 </head>
-<body>
+<body class="login-body">
 
-    <form method="POST" action="{% url 'login' %}">
-        {% csrf_token %}
-        <input type="text" name="username" placeholder="Username"><br>
-        <input type="password" name="password" placeholder="Password"><br>
-        <input type="submit" value="Login">
-    </form>
+    <div class="login-container">
+        <h2 class="login-title">Login to Travel Blog</h2>
+        
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p class="alert {{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-    <div>
-        {% for message in messages %}
-            <h3>{{ message }}</h3>
-        {% endfor %}
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+
+        <p class="forgot-password">
+            <a href="{% url 'password_reset' %}">Forgot Password?</a>
+        </p>
     </div>
 
-    <form method= "post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        {% comment %} <button type= "submit">Login</button> {% endcomment %}
-    </form>
-    
-    <p><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
-
-
-   
-   
 </body>
 </html>

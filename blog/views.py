@@ -61,9 +61,9 @@ def login(request):
          
          if user is not None:
              auth.login(request, user)
-             return redirect('/')
+             return redirect("home")
          else:
-             messages.info(request, 'Invalid credentials')
+             messages.error(request, 'Invalid credentials')
              return redirect('login')
     else:
         return render(request, 'login.html')    
@@ -83,22 +83,22 @@ def register(request):
         
         if password1 == password2:
             if User.objects.filter(username=username).exists():
-                  messages.info(request,'Username Taken')
+                  messages.error(request,'Username Taken')
                   return redirect('register')
               
               
             elif User.objects.filter(email=email).exists():
-                  messages.info(request,'Email Taken')
+                  messages.error(request,'Email Taken')
                   return redirect('register')
               
             else:
                 user = User.objects.create_user(username=username, password=password1, email=email, first_name=first_name, last_name=last_name)
                 user.save()
-                messages.info(request, 'User created successfully... ')
+                messages.success(request, 'User created successfully... ')
                 return redirect('login')
                 
         else:
-            messages.info(request, "password not matching....")
+            messages.error(request, "password not matching....")
             return redirect('register')
             return redirect('home')  # Redirect to home or another page after registration
         
