@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.urls import reverse_lazy
 from .forms import ReviewForm
 from .models import Destination, DestinationImage
 
@@ -61,16 +64,16 @@ def login(request):
          
          if user is not None:
              auth.login(request, user)
+             messages.success(request, 'Welcome back!')
              return redirect("home")
          else:
-             messages.error(request, 'Invalid credentials')
+             messages.error(request, 'Invalid credentials. Please try again.')
              return redirect('login')
     else:
         return render(request, 'login.html')    
         
 
-
-def register(request): 
+def register(request):
     
     if request.method == 'POST':
         # Handle the registration logic here
@@ -96,7 +99,7 @@ def register(request):
                 user.save()
                 messages.success(request, 'User created successfully... ')
                 return redirect('login')
-                
+
         else:
             messages.error(request, "password not matching....")
             return redirect('register')
@@ -104,7 +107,15 @@ def register(request):
         
     else:
         return render(request, 'register.html')  # Render the registration template
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'registration/password_reset_confirm.html'
+    success_url = reverse_lazy('login')
     
+    def form_valid(self, form):
+        messages.success(self.request, 'Your password has been successfully updated. Please log in with your new password.')
+        return super().form_valid(form)
+
 def logout(request):
     auth.logout(request)
     return redirect('/')  # Redirect to home or another page after logout   
